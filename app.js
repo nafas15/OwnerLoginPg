@@ -12,6 +12,7 @@ import {
   getEmployeeSalaries,
   saveSalary,
   calculateSalaryForEmployee,
+  deleteSalary,
   getSettings,
   saveSettings,
   initializeDatabase,
@@ -441,7 +442,7 @@ function drawOwnerDashboard() {
   const tbody = document.querySelector('#dashboard-summary-table tbody');
   tbody.innerHTML = '';
   if (activeEmps.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" class="empty-row">No employees registered yet.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-row">No employees registered yet.</td></tr>`;
     return;
   }
   activeEmps.forEach(emp => {
@@ -457,7 +458,28 @@ function drawOwnerDashboard() {
       <td style="color:${absentCnt > 0 ? 'var(--danger)' : 'inherit'}">${absentCnt} days</td>
       <td>${calc.overtime_hours} hrs</td>
       <td><strong>${fmtCurrency(calc.net_salary, settings.currency)}</strong></td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm btn-secondary edit-payroll-btn">✏️ Edit</button>
+          <button class="btn btn-sm btn-danger-action delete-payroll-btn" ${calc.is_processed ? '' : 'disabled style="opacity:0.4; cursor:not-allowed;"'}>🗑️ Delete</button>
+        </div>
+      </td>
     `;
+
+    tr.querySelector('.edit-payroll-btn').addEventListener('click', () => {
+      openSalaryModal(calc);
+    });
+
+    const deleteBtn = tr.querySelector('.delete-payroll-btn');
+    deleteBtn.addEventListener('click', () => {
+      if (confirm(`Are you sure you want to reset/delete the processed payroll for ${emp.name} for ${formatMonthLabel(state.selectedPayrollMonth)}?`)) {
+        deleteSalary(emp.employee_id, state.selectedPayrollMonth);
+        drawOwnerDashboard();
+        drawPayrollManagement();
+        showToast(`Payroll record for ${emp.name} reset.`, 'info');
+      }
+    });
+
     tbody.appendChild(tr);
   });
 }
@@ -952,6 +974,7 @@ function saveSalaryHandler() {
   
   closeSalaryModal();
   drawPayrollManagement();
+  drawOwnerDashboard();
   showToast(`Salary approved for ${preview.name} — ${formatMonthLabel(month)}`, 'success');
 }
 

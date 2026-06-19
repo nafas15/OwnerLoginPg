@@ -346,6 +346,14 @@ export function saveSalary(salaryRecord) {
   return record;
 }
 
+export function deleteSalary(employeeId, month) {
+  const salaries = getSalaries();
+  const recordId = `${employeeId}_${month}`;
+  const filtered = salaries.filter(s => s.id !== recordId);
+  localStorage.setItem(KEYS.SALARIES, JSON.stringify(filtered));
+  return true;
+}
+
 // Compute salary preview for an employee for a specific month based on attendance
 export function calculateSalaryForEmployee(employeeId, monthStr) {
   const employees = getEmployees();
