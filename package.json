@@ -1,0 +1,16 @@
+{
+  "name": "aksha-farm-payroll",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "predev": "node -e \"if (!require('fs').existsSync('node_modules')) { console.error('Error: node_modules is missing! Please run \\\"npm install\\\" first.'); process.exit(1); }\"",
+    "dev": "vite",
+    "prebuild": "node -e \"if (!require('fs').existsSync('node_modules')) { console.error('Error: node_modules is missing! Please run \\\"npm install\\\" first.'); process.exit(1); }\"",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

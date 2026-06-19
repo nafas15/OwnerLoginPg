@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AKSHA FARM - Employee & Payroll Management System</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- View states are injected here dynamically by app.js -->
+    
+    <!-- 1. LOGIN SCREEN -->
+    <div id="login-view" class="login-container" style="display: none;">
+      <div class="login-card">
+        <div class="login-logo">🌾</div>
+        <h2>AKSHA FARM</h2>
+        <p>Employee & Payroll Portal</p>
+        <div class="login-form">
+          <div class="form-group">
+            <label for="login-username">Employee ID or Admin Username</label>
+            <input type="text" id="login-username" class="form-input" placeholder="e.g. EMP001 or admin" autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password (Optional for Demo)</label>
+            <input type="password" id="login-password" class="form-input" placeholder="••••••••" autocomplete="current-password">
+          </div>
+          <button id="btn-login-submit" class="btn btn-primary">Sign In</button>
+          
+          <div class="role-switcher-container">
+            <span>Quick Login for Demo</span>
+            <div class="role-buttons">
+              <button id="quick-admin-login" class="btn btn-outline">👑 Owner (Admin)</button>
+              <button id="quick-emp-login" class="btn btn-outline">👷 Employee</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. MAIN APP SHELL (ADMIN) -->
+    <div id="admin-shell" style="display: none; width: 100%;">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo-icon">🌾</div>
+          <h2>AKSHA FARM</h2>
+        </div>
+        <ul class="sidebar-menu">
+          <li class="menu-item active" data-target="owner-dashboard">
+            <a href="#dashboard"><span class="menu-icon">🏠</span><span class="menu-text">Dashboard</span></a>
+          </li>
+          <li class="menu-item" data-target="owner-employees">
+            <a href="#employees"><span class="menu-icon">👨</span><span class="menu-text">Employees</span></a>
+          </li>
+          <li class="menu-item" data-target="owner-attendance">
+            <a href="#attendance"><span class="menu-icon">📅</span><span class="menu-text">Attendance</span></a>
+          </li>
+          <li class="menu-item" data-target="owner-leaves">
+            <a href="#leaves"><span class="menu-icon">📝</span><span class="menu-text">Leave Requests</span></a>
+          </li>
+          <li class="menu-item" data-target="owner-salary">
+            <a href="#salary"><span class="menu-icon">💰</span><span class="menu-text">Salary</span></a>
+          </li>
+          <li class="menu-item" data-target="owner-reports">
+            <a href="#reports"><span class="menu-icon">📊</span><span class="menu-text">Reports</span></a>
+          </li>
+          <li class="menu-item" data-target="owner-settings">
+            <a href="#settings"><span class="menu-icon">⚙️</span><span class="menu-text">Settings</span></a>
+          </li>
+          
+          <div class="menu-divider"></div>
+          <div class="menu-section-title">Future Farm Modules</div>
+          
+          <li class="menu-item future-module" data-target="future-poultry">
+            <a href="#poultry"><span class="menu-icon">🐔</span><span class="menu-text">Poultry Management</span><span class="future-badge">Soon</span></a>
+          </li>
+          <li class="menu-item future-module" data-target="future-feed">
+            <a href="#feed"><span class="menu-icon">🌾</span><span class="menu-text">Feed Management</span><span class="future-badge">Soon</span></a>
+          </li>
+          <li class="menu-item future-module" data-target="future-expense">
+            <a href="#expenses"><span class="menu-icon">💸</span><span class="menu-text">Expense Management</span><span class="future-badge">Soon</span></a>
+          </li>
+          <li class="menu-item future-module" data-target="future-sales">
+            <a href="#sales"><span class="menu-icon">🚚</span><span class="menu-text">Sales Management</span><span class="future-badge">Soon</span></a>
+          </li>
+        </ul>
+        <div class="sidebar-user">
+          <div class="user-info">
+            <div class="user-avatar">OW</div>
+            <div class="user-details">
+              <span class="user-name">Owner / Admin</span>
+              <span class="user-role">System Administrator</span>
+            </div>
+          </div>
+          <button class="btn-logout btn-admin-logout">🔓 Sign Out</button>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <!-- Top Bar -->
+        <header class="top-bar">
+          <div class="page-title">
+            <h1 id="topbar-title">Dashboard</h1>
+          </div>
+          <div class="top-bar-actions">
+            <div class="theme-switch" id="theme-toggler">
+              <button class="theme-switch-btn active" data-theme="dark">🌙 Dark</button>
+              <button class="theme-switch-btn" data-theme="light">☀️ Light</button>
+            </div>
+          </div>
+        </header>
+
+        <!-- View Content Containers -->
+        <div class="content-wrapper">
+          
+          <!-- owner-dashboard Section -->
+          <div id="view-owner-dashboard" class="app-view">
+            <div class="dashboard-grid">
+              <div class="metric-card">
+                <div class="metric-icon">👨</div>
+                <div class="metric-info">
+                  <h3>Total Employees</h3>
+                  <div id="stat-total-employees" class="metric-value">0</div>
+                </div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-icon">✅</div>
+                <div class="metric-info">
+                  <h3>Present Today</h3>
+                  <div id="stat-present-today" class="metric-value">0</div>
+                </div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-icon">❌</div>
+                <div class="metric-info">
+                  <h3>Absent Today</h3>
+                  <div id="stat-absent-today" class="metric-value">0</div>
+                </div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-icon">💰</div>
+                <div class="metric-info">
+                  <h3>Salary This Month</h3>
+                  <div id="stat-salary-expense" class="metric-value">Rs. 0</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dashboard Charts / Quick Reports -->
+            <div class="section-card">
+              <div class="card-header">
+                <h2>📊 Farm Payroll & Attendance Report (Current Month)</h2>
+              </div>
+              <div class="table-responsive">
+                <table class="custom-table" id="dashboard-summary-table">
+                  <thead>
+                    <tr>
+                      <th>Employee</th>
+                      <th>Salary Type</th>
+                      <th>Days Worked</th>
+                      <th>Absent Days</th>
+                      <th>Overtime Hours</th>
+                      <th>Estimated Salary</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Injected dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- owner-employees Section -->
+          <div id="view-owner-employees" class="app-view" style="display: none;">
+            <div class="section-card">
+              <div class="card-header">
+                <h2>👨 Employees Directory</h2>
+                <button id="btn-add-employee" class="btn btn-primary-action">+ Add New Employee</button>
+              </div>
+              <div class="table-responsive">
+                <table class="custom-table" id="employees-table">
+                  <thead>
+                    <tr>
+                      <th>Employee ID</th>
+                      <th>Name</th>
+                      <th>Phone</th>
+                      <th>Position</th>
+                      <th>Join Date</th>
+                      <th>Salary Type</th>
+                      <th>Daily/Monthly Rate</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Injected dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- owner-attendance Section -->
+          <div id="view-owner-attendance" class="app-view" style="display: none;">
+            <div class="tab-container" style="margin-bottom: 20px; display: flex; gap: 10px;">
+              <button id="btn-att-tab-mark" class="btn btn-secondary active">Mark Daily Attendance</button>
+              <button id="btn-att-tab-summary" class="btn btn-secondary">Monthly Attendance Summary</button>
+            </div>
+
+            <div id="subview-att-mark">
+              <div class="section-card">
+                <div class="card-header">
+                  <h2>📅 Daily Attendance Marking</h2>
+                  <div style="display: flex; gap: 15px; align-items: center;">
+                    <label for="attendance-date" style="font-weight: 500;">Select Date:</label>
+                    <input type="date" id="attendance-date" class="form-input" style="width: 180px;">
+                  </div>
+                </div>
+                
+                <!-- Attendance Marking Checklist -->
+                <div class="attendance-grid-list" id="attendance-marking-list">
+                  <!-- Injected dynamically -->
+                </div>
+                
+                <div style="margin-top: 30px; display: flex; justify-content: flex-end;">
+                  <button id="btn-save-attendance" class="btn btn-primary-action">💾 Save Daily Attendance</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="subview-att-summary" style="display: none;">
+              <div class="section-card">
+                <div class="card-header">
+                  <h2>📅 Monthly Attendance Summary</h2>
+                  <div style="display: flex; gap: 15px; align-items: center;">
+                    <label for="attendance-summary-month" style="font-weight: 500;">Select Month:</label>
+                    <input type="month" id="attendance-summary-month" class="form-input" style="width: 180px;">
+                  </div>
+                </div>
+                
+                <div class="table-responsive">
+                  <table class="custom-table" id="attendance-summary-table">
+                    <thead>
+                      <tr>
+                        <th>Employee</th>
+                        <th>Present (days)</th>
+                        <th>Half Day (days)</th>
+                        <th>Absent (days)</th>
+                        <th>Leave (days)</th>
+                        <th>Holiday (days)</th>
+                        <th>OT (hours)</th>
+                        <th>Total Days Worked</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Injected dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- owner-leaves Section -->
+          <div id="view-owner-leaves" class="app-view" style="display: none;">
+            <div class="section-card">
+              <div class="card-header">
+                <h2>📝 Leave Applications</h2>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                  <label for="leaves-filter" style="font-weight: 500;">Filter Status:</label>
+                  <select id="leaves-filter" class="form-input" style="width: 150px; padding: 6px 12px;">
+                    <option value="All">All Requests</option>
+                    <option value="Pending" selected>Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="table-responsive">
+                <table class="custom-table" id="admin-leaves-table">
+                  <thead>
+                    <tr>
+                      <th>Employee</th>
+                      <th>Leave Type</th>
+                      <th>Duration</th>
+                      <th>Days</th>
+                      <th>Reason</th>
+                      <th>Status</th>
+                      <th>Applied On</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Injected dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- owner-salary Section -->
+          <div id="view-owner-salary" class="app-view" style="display: none;">
+            <div class="section-card">
+              <div class="card-header">
+                <h2>💰 Payroll Management</h2>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                  <label for="payroll-month" style="font-weight: 500;">Month:</label>
+                  <input type="month" id="payroll-month" class="form-input" style="width: 180px;">
+                </div>
+              </div>
+              
+              <div class="table-responsive">
+                <table class="custom-table" id="payroll-table">
+                  <thead>
+                    <tr>
+                      <th>Employee ID</th>
+                      <th>Name</th>
+                      <th>Salary Type</th>
+                      <th>Days Worked</th>
+                      <th>Overtime (Hrs)</th>
+                      <th>Base Rate</th>
+                      <th>Deductions</th>
+                      <th>Bonus</th>
+                      <th>Net Salary</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Injected dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- owner-reports Section -->
+          <div id="view-owner-reports" class="app-view" style="display: none;">
+            <div class="tab-container" style="margin-bottom: 20px; display: flex; gap: 10px;">
+              <button id="btn-rep-tab-salary" class="btn btn-secondary active">💰 Salary & Payroll</button>
+              <button id="btn-rep-tab-attendance" class="btn btn-secondary">📅 Attendance Reports</button>
+              <button id="btn-rep-tab-leaves" class="btn btn-secondary">📝 Leave Reports</button>
+            </div>
+
+            <!-- Subview: Salary Reports -->
+            <div id="subview-rep-salary">
+              <div class="section-card">
+                <div class="card-header">
+                  <h2>📊 Monthly Payroll Summary</h2>
+                  <div style="display: flex; gap: 15px; align-items: center;">
+                    <label for="report-month" style="font-weight: 500;">Select Month:</label>
+                    <input type="month" id="report-month" class="form-input" style="width: 180px;">
+                  </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                  <div class="metric-card">
+                    <div class="metric-icon">💰</div>
+                    <div class="metric-info">
+                      <h3>Total Payout</h3>
+                      <div id="report-total-payout" class="metric-value">Rs. 0</div>
+                    </div>
+                  </div>
+                  <div class="metric-card">
+                    <div class="metric-icon">🚜</div>
+                    <div class="metric-info">
+                      <h3>Daily Workers Payout</h3>
+                      <div id="report-daily-payout" class="metric-value">Rs. 0</div>
+                    </div>
+                  </div>
+                  <div class="metric-card">
+                    <div class="metric-icon">🏢</div>
+                    <div class="metric-info">
+                      <h3>Monthly Workers Payout</h3>
+                      <div id="report-monthly-payout" class="metric-value">Rs. 0</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="custom-table" id="reports-payroll-summary-table">
+                    <thead>
+                      <tr>
+                        <th>Employee ID</th>
+                        <th>Name</th>
+                        <th>Salary Type</th>
+                        <th>Base Pay</th>
+                        <th>Overtime Pay</th>
+                        <th>Deductions</th>
+                        <th>Bonus</th>
+                        <th>Net Salary</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Injected dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <div style="margin-top: 25px; display: flex; gap: 12px; justify-content: flex-end;">
+                  <button id="btn-print-report" class="btn btn-secondary">🖨️ Print Report</button>
+                  <button id="btn-export-csv" class="btn btn-primary-action">📥 Export CSV</button>
+                </div>
+              </div>
+
+              <!-- Employee Salary History Card -->
+              <div class="section-card">
+                <div class="card-header">
+                  <h2>👨 Employee Salary History Search</h2>
+                  <div style="display: flex; gap: 15px; align-items: center;">
+                    <label for="report-salary-emp-id" style="font-weight: 500;">Select Employee:</label>
+                    <select id="report-salary-emp-id" class="form-input" style="width: 220px;">
+                      <!-- Injected dynamically -->
+                    </select>
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="custom-table" id="reports-emp-history-table">
+                    <thead>
+                      <tr>
+                        <th>Month</th>
+                        <th>Days Worked</th>
+                        <th>OT Hours</th>
+                        <th>Deductions</th>
+                        <th>Bonus</th>
+                        <th>Net Salary</th>
+                        <th>Processed Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Injected dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Subview: Attendance Reports -->
+            <div id="subview-rep-attendance" style="display: none;">
+              <div class="section-card">
+                <div class="card-header">
+                  <h2>📅 Attendance Metrics & Reports</h2>
+                  <div style="display: flex; gap: 15px; align-items: center;">
+                    <label for="report-attendance-month" style="font-weight: 500;">Select Month:</label>
+                    <input type="month" id="report-attendance-month" class="form-input" style="width: 180px;">
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                  <div class="metric-card">
+                    <div class="metric-icon">✅</div>
+                    <div class="metric-info">
+                      <h3>Avg Attendance Rate</h3>
+                      <div id="report-att-rate" class="metric-value">0%</div>
+                    </div>
+                  </div>
+                  <div class="metric-card">
+                    <div class="metric-icon">🤕</div>
+                    <div class="metric-info">
+                      <h3>Total Absent Days</h3>
+                      <div id="report-att-total-absent" class="metric-value">0 days</div>
+                    </div>
+                  </div>
+                  <div class="metric-card">
+                    <div class="metric-icon">📝</div>
+                    <div class="metric-info">
+                      <h3>Total Leave Days</h3>
+                      <div id="report-att-total-leave" class="metric-value">0 days</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="custom-table" id="reports-attendance-table">
+                    <thead>
+                      <tr>
+                        <th>Employee</th>
+                        <th>Salary Type</th>
+                        <th>Present Days</th>
+                        <th>Half Days</th>
+                        <th>Absent Days</th>
+                        <th>Leave Days</th>
+                        <th>Holiday Days</th>
+                        <th>OT Hours</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Injected dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Subview: Leave Reports -->
+            <div id="subview-rep-leaves" style="display: none;">
+              <div class="section-card">
+                <div class="card-header">
+                  <h2>📝 Leave Allocation & Reports</h2>
+                  <div style="display: flex; gap: 15px; align-items: center;">
+                    <label for="report-leave-month" style="font-weight: 500;">Select Month:</label>
+                    <input type="month" id="report-leave-month" class="form-input" style="width: 180px;">
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                  <div class="metric-card">
+                    <div class="metric-icon">⏳</div>
+                    <div class="metric-info">
+                      <h3>Pending Requests</h3>
+                      <div id="report-leaves-pending" class="metric-value">0</div>
+                    </div>
+                  </div>
+                  <div class="metric-card">
+                    <div class="metric-icon">✅</div>
+                    <div class="metric-info">
+                      <h3>Approved (This Month)</h3>
+                      <div id="report-leaves-approved" class="metric-value">0</div>
+                    </div>
+                  </div>
+                  <div class="metric-card">
+                    <div class="metric-icon">❌</div>
+                    <div class="metric-info">
+                      <h3>Rejected (This Month)</h3>
+                      <div id="report-leaves-rejected" class="metric-value">0</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="custom-table" id="reports-leaves-table">
+                    <thead>
+                      <tr>
+                        <th>Employee</th>
+                        <th>Leave Type</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Days</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Injected dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- owner-settings Section -->
+          <div id="view-owner-settings" class="app-view" style="display: none;">
+            <div class="settings-grid">
+              <div class="section-card">
+                <div class="card-header">
+                  <h2>⚙️ Company Settings</h2>
+                </div>
+                <div class="form-row">
+                  <div class="form-group-half">
+                    <label for="settings-company-name">Company Name</label>
+                    <input type="text" id="settings-company-name" class="form-input">
+                  </div>
+                  <div class="form-group-half">
+                    <label for="settings-company-phone">Contact Number</label>
+                    <input type="text" id="settings-company-phone" class="form-input">
+                  </div>
+                </div>
+                <div class="form-group-full">
+                  <label for="settings-company-address">Company Address</label>
+                  <input type="text" id="settings-company-address" class="form-input">
+                </div>
+                <div class="form-row">
+                  <div class="form-group-half">
+                    <label for="settings-currency">Currency Symbol</label>
+                    <input type="text" id="settings-currency" class="form-input">
+                  </div>
+                  <div class="form-group-half">
+                    <label for="settings-ot-rate">Monthly Worker OT Rate (per hour)</label>
+                    <input type="number" id="settings-ot-rate" class="form-input">
+                  </div>
+                </div>
+
+                <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 25px;">
+                  <h3 style="font-size: 1.1rem; font-family: var(--font-title); font-weight: 700; margin-bottom: 15px;">📝 Leave Limits (Annual Limits in Days)</h3>
+                  <div class="form-row">
+                    <div class="form-group-half">
+                      <label for="settings-limit-annual">Annual Leave</label>
+                      <input type="number" id="settings-limit-annual" class="form-input">
+                    </div>
+                    <div class="form-group-half">
+                      <label for="settings-limit-sick">Sick Leave</label>
+                      <input type="number" id="settings-limit-sick" class="form-input">
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group-half">
+                      <label for="settings-limit-casual">Casual Leave</label>
+                      <input type="number" id="settings-limit-casual" class="form-input">
+                    </div>
+                    <div class="form-group-half">
+                      <label for="settings-limit-emergency">Emergency Leave</label>
+                      <input type="number" id="settings-limit-emergency" class="form-input">
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top: 20px; text-align: right;">
+                  <button id="btn-save-settings" class="btn btn-primary-action">💾 Save Settings</button>
+                </div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 30px;">
+                <div class="section-card">
+                  <div class="card-header">
+                    <h2>🏖️ Public Holidays</h2>
+                  </div>
+                  <ul id="settings-holidays-list" style="list-style: none; font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; margin-bottom: 15px; padding: 10px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <!-- Injected dynamically -->
+                  </ul>
+                  <div style="display: flex; gap: 8px;">
+                    <input type="date" id="new-holiday-date" class="form-input" style="padding: 6px; font-size: 0.8rem; width: 110px;">
+                    <input type="text" id="new-holiday-name" class="form-input" placeholder="Name" style="padding: 6px; font-size: 0.8rem;">
+                    <button id="btn-add-holiday" class="btn btn-sm btn-primary-action">+</button>
+                  </div>
+                </div>
+
+                <div class="section-card">
+                  <div class="card-header">
+                    <h2>🔑 System Info</h2>
+                  </div>
+                  <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">
+                    This app stores all details locally on this device via LocalStorage.
+                  </p>
+                  <div style="padding: 12px; background-color: var(--bg-card); border-radius: 8px; font-family: monospace; font-size: 0.75rem; border: 1px solid var(--border-color); margin-bottom: 15px;">
+                    Storage: LocalStorage<br>
+                    State: Online / Client<br>
+                    Tables Loaded: 6
+                  </div>
+                  <button id="btn-reset-data" class="btn btn-sm btn-danger-action" style="width: 100%;">⚠️ Reset Demo Data</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Future Poultry Section -->
+          <div id="view-future-poultry" class="app-view future-module-card" style="display: none;">
+            <div class="coming-soon-banner">Future</div>
+            <div class="section-card">
+              <div class="card-header">
+                <h2>🐔 Poultry Management</h2>
+              </div>
+              <p class="coming-soon-desc">
+                Aksha Farm's upcoming Poultry Management system. This model is currently scheduled to follow the deployment of Employee & Payroll modules.
+              </p>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px;">
+                <div style="padding: 20px; border: 1px dashed var(--border-color); border-radius: 10px; text-align: center;">
+                  <div style="font-size: 2.5rem;">🐥</div>
+                  <h4 style="margin: 10px 0 5px 0;">Bird Batches</h4>
+                  <p style="font-size: 0.8rem; color: var(--text-muted);">Track arrivals, vaccine dates, and active flock counts.</p>
+                </div>
+                <div style="padding: 20px; border: 1px dashed var(--border-color); border-radius: 10px; text-align: center;">
+                  <div style="font-size: 2.5rem;">💀</div>
+                  <h4 style="margin: 10px 0 5px 0;">Mortality Records</h4>
+                  <p style="font-size: 0.8rem; color: var(--text-muted);">Log daily mortality indices to maintain safety standards.</p>
+                </div>
+                <div style="padding: 20px; border: 1px dashed var(--border-color); border-radius: 10px; text-align: center;">
+                  <div style="font-size: 2.5rem;">💉</div>
+                  <h4 style="margin: 10px 0 5px 0;">Vaccination Logs</h4>
+                  <p style="font-size: 0.8rem; color: var(--text-muted);">Automated calendars for immunizations.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Future Feed Section -->
+          <div id="view-future-feed" class="app-view future-module-card" style="display: none;">
+            <div class="coming-soon-banner">Future</div>
+            <div class="section-card">
+              <div class="card-header">
+                <h2>🌾 Feed Management</h2>
+              </div>
+              <p class="coming-soon-desc">
+                Log inventory levels and consumption records for feed silos.
+              </p>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
+                <div style="padding: 20px; border: 1px dashed var(--border-color); border-radius: 10px;">
+                  <h4 style="margin-bottom: 10px;">🛍️ Purchases & Stock levels</h4>
+                  <p style="font-size: 0.85rem; color: var(--text-muted);">Keep tab on sacks purchased, supplier rates, and present quantities in storehouses.</p>
+                </div>
+                <div style="padding: 20px; border: 1px dashed var(--border-color); border-radius: 10px;">
+                  <h4 style="margin-bottom: 10px;">🍽️ Feeding logs</h4>
+                  <p style="font-size: 0.85rem; color: var(--text-muted);">Automated alarms for feeding times based on birds' ages.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Future Expense Section -->
+          <div id="view-future-expense" class="app-view future-module-card" style="display: none;">
+            <div class="coming-soon-banner">Future</div>
+            <div class="section-card">
+              <div class="card-header">
+                <h2>💸 Expense Management</h2>
+              </div>
+              <p class="coming-soon-desc">
+                Record overhead utility costs, medicinal costs, and farm logistics fees to analyze margins.
+              </p>
+            </div>
+          </div>
+
+          <!-- Future Sales Section -->
+          <div id="view-future-sales" class="app-view future-module-card" style="display: none;">
+            <div class="coming-soon-banner">Future</div>
+            <div class="section-card">
+              <div class="card-header">
+                <h2>🚚 Sales Management</h2>
+              </div>
+              <p class="coming-soon-desc">
+                Order processing sheet for eggs, chicken wholesale, invoices generation, and customer databases.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+
+    <!-- 3. EMPLOYEE PORTAL SHELL -->
+    <div id="employee-shell" style="display: none; width: 100%;">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo-icon">🌾</div>
+          <h2>AKSHA FARM</h2>
+        </div>
+        <ul class="sidebar-menu">
+          <li class="menu-item active" data-target="emp-dashboard">
+            <a href="#emp-dashboard"><span class="menu-icon">🏠</span><span class="menu-text">Dashboard</span></a>
+          </li>
+          <li class="menu-item" data-target="emp-attendance">
+            <a href="#emp-attendance"><span class="menu-icon">📅</span><span class="menu-text">My Attendance</span></a>
+          </li>
+          <li class="menu-item" data-target="emp-leaves">
+            <a href="#emp-leaves"><span class="menu-icon">📝</span><span class="menu-text">Leave Requests</span></a>
+          </li>
+          <li class="menu-item" data-target="emp-payslips">
+            <a href="#emp-payslips"><span class="menu-icon">📄</span><span class="menu-text">My Payslips</span></a>
+          </li>
+          <li class="menu-item" data-target="emp-notifications">
+            <a href="#emp-notifications">
+              <span class="menu-icon">🔔</span>
+              <span class="menu-text">Notifications</span>
+              <span id="emp-unread-count" class="badge badge-danger" style="display: none; padding: 2px 6px; font-size: 0.65rem; border-radius: 10px; margin-left: auto;">0</span>
+            </a>
+          </li>
+        </ul>
+        <div class="sidebar-user">
+          <div class="user-info">
+            <div class="user-avatar" id="emp-sidebar-avatar">EP</div>
+            <div class="user-details">
+              <span class="user-name" id="emp-sidebar-name">Employee Name</span>
+              <span class="user-role" id="emp-sidebar-id">EMP000</span>
+            </div>
+          </div>
+          <button class="btn-logout btn-employee-logout">🔓 Sign Out</button>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <!-- Top Bar -->
+        <header class="top-bar">
+          <div class="page-title">
+            <h1>Employee Portal</h1>
+          </div>
+          <div class="top-bar-actions">
+            <div class="theme-switch" id="emp-theme-toggler">
+              <button class="theme-switch-btn active" data-theme="dark">🌙 Dark</button>
+              <button class="theme-switch-btn" data-theme="light">☀️ Light</button>
+            </div>
+          </div>
+        </header>
+
+        <!-- View Content Containers -->
+        <div class="content-wrapper">
+          
+          <!-- employee-dashboard Section -->
+          <div id="view-emp-dashboard" class="app-view">
+            <div class="employee-panel-grid">
+              <!-- Sidebar Stats -->
+              <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="section-card" style="text-align: center; padding: 30px 20px;">
+                  <div class="user-avatar" id="emp-profile-avatar" style="width: 80px; height: 80px; font-size: 2.2rem; margin: 0 auto 20px auto;">EP</div>
+                  <h2 id="emp-profile-name" style="font-family: var(--font-title); font-size: 1.3rem;">Name</h2>
+                  <p id="emp-profile-position" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Position</p>
+                  
+                  <div style="border-top: 1px solid var(--border-color); padding-top: 15px; text-align: left; font-size: 0.85rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                      <span style="color: var(--text-muted);">Employee ID:</span>
+                      <strong id="emp-profile-id">-</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                      <span style="color: var(--text-muted);">NIC Number:</span>
+                      <strong id="emp-profile-nic">-</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                      <span style="color: var(--text-muted);">Phone Number:</span>
+                      <strong id="emp-profile-phone">-</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                      <span style="color: var(--text-muted);">Address:</span>
+                      <strong id="emp-profile-address" style="text-align: right; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                      <span style="color: var(--text-muted);">Joined On:</span>
+                      <strong id="emp-profile-join">-</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                      <span style="color: var(--text-muted);">Salary Type:</span>
+                      <strong id="emp-profile-salary-type">-</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="section-card" style="padding: 20px;">
+                  <h3 style="font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 15px;">Monthly Stat</h3>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: center;">
+                    <div style="padding: 12px; background-color: var(--bg-card); border-radius: 8px;">
+                      <div style="font-size: 1.5rem; font-weight: bold; color: var(--success);" id="emp-stat-days-worked">0</div>
+                      <div style="font-size: 0.75rem; color: var(--text-muted);">Days Worked</div>
+                    </div>
+                    <div style="padding: 12px; background-color: var(--bg-card); border-radius: 8px;">
+                      <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent);" id="emp-stat-ot-hours">0</div>
+                      <div style="font-size: 0.75rem; color: var(--text-muted);">OT Hours</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Main Panel: Quick summary / Notifications -->
+              <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="section-card">
+                  <div class="card-header">
+                    <h2>🔔 Recent Notifications</h2>
+                    <button class="btn btn-sm btn-secondary" id="btn-dashboard-view-all-notif">View All</button>
+                  </div>
+                  <div id="emp-dashboard-notif-list" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Injected dynamically -->
+                  </div>
+                </div>
+
+                <div class="section-card">
+                  <div class="card-header">
+                    <h2>📝 Leave Balances Summary</h2>
+                    <button class="btn btn-sm btn-secondary" id="btn-dashboard-apply-leave">Apply Leave</button>
+                  </div>
+                  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;" id="emp-dashboard-leave-grid">
+                    <!-- Injected dynamically -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- employee-attendance Section -->
+          <div id="view-emp-attendance" class="app-view" style="display: none;">
+            <div class="section-card">
+              <div class="card-header">
+                <h2>📅 My Attendance History</h2>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                  <label for="emp-attendance-month-filter" style="font-weight: 500;">Select Month:</label>
+                  <input type="month" id="emp-attendance-month-filter" class="form-input" style="width: 180px;">
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="custom-table" id="emp-attendance-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Status</th>
+                      <th>Overtime (Hours)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Injected dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- employee-leaves Section -->
+          <div id="view-emp-leaves" class="app-view" style="display: none;">
+            <!-- Leave Balance Widgets -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px;" id="emp-leave-balance-widgets">
+              <!-- Cards for Annual, Sick, Casual, Emergency balances, dynamically injected -->
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.2fr 2fr; gap: 25px;">
+              <!-- Apply Leave Card -->
+              <div class="section-card">
+                <div class="card-header">
+                  <h2>📝 Apply for Leave</h2>
+                </div>
+                <form id="emp-apply-leave-form">
+                  <div class="form-group-full">
+                    <label for="leave-apply-type">Leave Type</label>
+                    <select id="leave-apply-type" class="form-input" required style="padding: 11px 16px;">
+                      <option value="Annual">Annual Leave</option>
+                      <option value="Sick">Sick Leave</option>
+                      <option value="Casual">Casual Leave</option>
+                      <option value="Emergency">Emergency Leave</option>
+                      <option value="Unpaid">Unpaid Leave</option>
+                    </select>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group-half">
+                      <label for="leave-apply-start">Start Date</label>
+                      <input type="date" id="leave-apply-start" class="form-input" required>
+                    </div>
+                    <div class="form-group-half">
+                      <label for="leave-apply-end">End Date</label>
+                      <input type="date" id="leave-apply-end" class="form-input" required>
+                    </div>
+                  </div>
+                  <div class="form-group-full">
+                    <label for="leave-apply-reason">Reason</label>
+                    <textarea id="leave-apply-reason" class="form-input" rows="3" placeholder="Explain the reason for leave..." required style="resize: none;"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary-action" style="width: 100%; margin-top: 10px;">💾 Submit Leave Request</button>
+                </form>
+              </div>
+
+              <!-- History Card -->
+              <div class="section-card">
+                <div class="card-header">
+                  <h2>📅 My Leave History</h2>
+                </div>
+                <div class="table-responsive">
+                  <table class="custom-table" id="emp-leaves-history-table">
+                    <thead>
+                      <tr>
+                        <th>Leave Type</th>
+                        <th>Duration</th>
+                        <th>Days</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Injected dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- employee-payslips Section -->
+          <div id="view-emp-payslips" class="app-view" style="display: none;">
+            <div class="section-card">
+              <div class="card-header">
+                <h2>📄 My Payslips</h2>
+              </div>
+              <div class="table-responsive">
+                <table class="custom-table" id="emp-payslips-table">
+                  <thead>
+                    <tr>
+                      <th>Month</th>
+                      <th>Days Worked</th>
+                      <th>Overtime (Hrs)</th>
+                      <th>Deductions</th>
+                      <th>Net Salary</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Injected dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- employee-notifications Section -->
+          <div id="view-emp-notifications" class="app-view" style="display: none;">
+            <div class="section-card">
+              <div class="card-header">
+                <h2>🔔 My Notifications</h2>
+                <button class="btn btn-sm btn-secondary" id="btn-emp-clear-notif">Mark All as Read</button>
+              </div>
+              <div id="emp-full-notifications-list" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- A. Employee Modal (Add / Edit) -->
+    <div id="employee-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="employee-modal-title">Add Employee</h3>
+          <button class="modal-close" id="btn-close-emp-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="employee-form">
+            <input type="hidden" id="emp-form-action" value="create">
+            <div class="form-row">
+              <div class="form-group-half">
+                <label for="emp-id">Employee ID</label>
+                <input type="text" id="emp-id" class="form-input" placeholder="e.g. EMP006" required>
+              </div>
+              <div class="form-group-half">
+                <label for="emp-name">Full Name</label>
+                <input type="text" id="emp-name" class="form-input" placeholder="Ahmed Perera" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group-half">
+                <label for="emp-nic">NIC Number</label>
+                <input type="text" id="emp-nic" class="form-input" placeholder="e.g. 951234567V" required>
+              </div>
+              <div class="form-group-half">
+                <label for="emp-password">Portal Password</label>
+                <input type="password" id="emp-password" class="form-input" placeholder="Portal password" value="password123" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group-half">
+                <label for="emp-phone">Phone Number</label>
+                <input type="text" id="emp-phone" class="form-input" placeholder="+94 77 123 4567" required>
+              </div>
+              <div class="form-group-half">
+                <label for="emp-position">Position</label>
+                <input type="text" id="emp-position" class="form-input" placeholder="Caretaker" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group-half">
+                <label for="emp-join-date">Join Date</label>
+                <input type="date" id="emp-join-date" class="form-input" required>
+              </div>
+              <div class="form-group-half">
+                <label for="emp-salary-type">Salary Type</label>
+                <select id="emp-salary-type" class="form-input" required style="padding: 11px 16px;">
+                  <option value="Daily">Daily Worker</option>
+                  <option value="Monthly">Monthly Worker</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group-full">
+              <label for="emp-address">Home Address</label>
+              <input type="text" id="emp-address" class="form-input" placeholder="12 Main St, Kurunegala" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group-half" id="container-daily-rate">
+                <label for="emp-daily-rate">Daily Rate (Rs.)</label>
+                <input type="number" id="emp-daily-rate" class="form-input" value="0">
+              </div>
+              <div class="form-group-half" id="container-monthly-salary" style="display: none;">
+                <label for="emp-monthly-salary">Monthly Salary (Rs.)</label>
+                <input type="number" id="emp-monthly-salary" class="form-input" value="0">
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="btn-cancel-emp">Cancel</button>
+          <button class="btn btn-primary-action" id="btn-save-emp-submit">Save Employee</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- B. Process Salary Modal (Deductions, Bonus, Adjustments) -->
+    <div id="process-salary-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Process Salary</h3>
+          <button class="modal-close" id="btn-close-salary-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="salary-form">
+            <input type="hidden" id="sal-emp-id">
+            <input type="hidden" id="sal-month">
+            
+            <div style="background-color: var(--bg-card); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color);">
+              <h4 id="sal-calc-name" style="margin-bottom: 5px;">Employee: -</h4>
+              <p id="sal-calc-meta" style="font-size: 0.85rem; color: var(--text-muted);">Type: - | Rate: -</p>
+              <p id="sal-calc-days" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Days Worked: - | Overtime Hours: -</p>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group-half">
+                <label for="sal-deductions">Deductions (Rs.)</label>
+                <input type="number" id="sal-deductions" class="form-input" value="0">
+              </div>
+              <div class="form-group-half">
+                <label for="sal-bonus">Bonus (Rs.)</label>
+                <input type="number" id="sal-bonus" class="form-input" value="0">
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group-half">
+                <label for="sal-advances">Advance Payments (Rs.)</label>
+                <input type="number" id="sal-advances" class="form-input" value="0">
+              </div>
+              <div class="form-group-half">
+                <label for="sal-leave-deductions">Leave Deductions (Rs.)</label>
+                <input type="number" id="sal-leave-deductions" class="form-input" value="0">
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-color);">
+              <span style="font-weight: 500; font-size: 1.1rem;">Calculated Net Salary:</span>
+              <span style="font-size: 1.5rem; font-weight: 800; color: var(--accent);" id="sal-calculated-net">Rs. 0</span>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="btn-cancel-salary">Cancel</button>
+          <button class="btn btn-primary-action" id="btn-save-salary-submit">Approve & Save Salary</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- C. Payslip Modal (Invoice styling with PDF/Print) -->
+    <div id="payslip-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content" style="max-width: 750px;">
+        <div class="modal-header">
+          <h3>Salary Slip</h3>
+          <button class="modal-close" id="btn-close-payslip-modal">&times;</button>
+        </div>
+        <div class="modal-body" id="payslip-modal-body">
+          <!-- Printable Payslip Paper -->
+          <div class="payslip-paper" id="printable-payslip">
+            <div class="payslip-header-block">
+              <div class="payslip-company">
+                <h2 id="payslip-company-name">AKSHA FARM</h2>
+                <p id="payslip-company-address">Negombo Road, Kurunegala, Sri Lanka</p>
+                <p id="payslip-company-phone">Phone: +94 77 123 4567</p>
+              </div>
+              <div class="payslip-title">
+                <h1>Salary Slip</h1>
+                <p id="payslip-display-month">June 2026</p>
+              </div>
+            </div>
+
+            <div class="payslip-meta-grid">
+              <div class="payslip-meta-col">
+                <h3>Employee Details</h3>
+                <div class="payslip-meta-row">
+                  <span class="payslip-meta-label">ID:</span>
+                  <span class="payslip-meta-value" id="payslip-emp-id">EMP001</span>
+                </div>
+                <div class="payslip-meta-row">
+                  <span class="payslip-meta-label">Name:</span>
+                  <span class="payslip-meta-value" id="payslip-emp-name">Ahmed Perera</span>
+                </div>
+                <div class="payslip-meta-row">
+                  <span class="payslip-meta-label">Position:</span>
+                  <span class="payslip-meta-value" id="payslip-emp-position">Tractor Driver</span>
+                </div>
+              </div>
+              <div class="payslip-meta-col">
+                <h3>Payment Info</h3>
+                <div class="payslip-meta-row">
+                  <span class="payslip-meta-label">Salary Type:</span>
+                  <span class="payslip-meta-value" id="payslip-emp-salary-type">Daily</span>
+                </div>
+                <div class="payslip-meta-row">
+                  <span class="payslip-meta-label">Base Rate:</span>
+                  <span class="payslip-meta-value" id="payslip-emp-rate">Rs. 1,500</span>
+                </div>
+                <div class="payslip-meta-row">
+                  <span class="payslip-meta-label">Days Worked:</span>
+                  <span class="payslip-meta-value" id="payslip-days-worked">25.0</span>
+                </div>
+              </div>
+            </div>
+
+            <table class="payslip-table">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th style="text-align: right;">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Base Wage (Days Worked / Monthly Rate)</td>
+                  <td class="amount-col" id="payslip-table-base">Rs. 37,500</td>
+                </tr>
+                <tr>
+                  <td>Overtime Wages (<span id="payslip-ot-hours">2.0</span> Hours)</td>
+                  <td class="amount-col" id="payslip-table-ot">Rs. 700</td>
+                </tr>
+                <tr>
+                  <td>Bonuses / Allowances</td>
+                  <td class="amount-col" id="payslip-table-bonus">Rs. 0</td>
+                </tr>
+                <tr>
+                  <td style="color: var(--danger);">Deductions (General)</td>
+                  <td class="amount-col" id="payslip-table-deductions" style="color: var(--danger);">Rs. 0</td>
+                </tr>
+                <tr>
+                  <td style="color: var(--danger);">Leave Deductions (Unpaid Leaves/Absences)</td>
+                  <td class="amount-col" id="payslip-table-leave-deductions" style="color: var(--danger);">Rs. 0</td>
+                </tr>
+                <tr>
+                  <td style="color: var(--danger);">Advance Payments</td>
+                  <td class="amount-col" id="payslip-table-advances" style="color: var(--danger);">Rs. 0</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="payslip-total-block">
+              <div class="payslip-net-box">
+                <span class="payslip-net-label">Net Pay Recieved</span>
+                <div class="payslip-net-value" id="payslip-table-net">Rs. 38,200</div>
+              </div>
+            </div>
+
+            <div class="payslip-footer-notes">
+              <p>This is a computer-generated salary slip and requires no signature.</p>
+              <p style="margin-top: 5px; font-weight: 600;">AKSHA FARM - Premium Poultry & Agricultural Products</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="btn-close-payslip">Cancel</button>
+          <button class="btn btn-primary-action" id="btn-print-payslip">🖨️ Print Payslip / Save PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- D. Leave Action Modal (Approve / Reject) -->
+    <div id="leave-action-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Review Leave Application</h3>
+          <button class="modal-close" id="btn-close-leave-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div style="background-color: var(--bg-card); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color);">
+            <h4 id="leave-action-emp-name" style="margin-bottom: 5px;">Employee: -</h4>
+            <p id="leave-action-type" style="font-size: 0.85rem; color: var(--text-muted);">Leave Type: -</p>
+            <p id="leave-action-dates" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Dates: -</p>
+            <p id="leave-action-reason" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; font-style: italic;">Reason: -</p>
+          </div>
+          
+          <div class="form-group-full">
+            <label for="leave-action-remarks">Admin Remarks</label>
+            <textarea id="leave-action-remarks" class="form-input" rows="3" placeholder="Enter remarks (optional)..." style="resize: none;"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: space-between;">
+          <button class="btn btn-secondary" id="btn-cancel-leave-action">Cancel</button>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-danger-action" id="btn-reject-leave-submit">Reject Leave</button>
+            <button class="btn btn-primary-action" id="btn-approve-leave-submit">Approve Leave</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Main JavaScript App Controller -->
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
