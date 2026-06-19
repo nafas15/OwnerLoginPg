@@ -12,9 +12,9 @@ const KEYS = {
 
 // Default Settings
 const DEFAULT_SETTINGS = {
-  companyName: 'AKSHA FARM',
-  companyAddress: 'Negombo Road, Kurunegala, Sri Lanka',
-  companyPhone: '+94 77 123 4567',
+  companyName: 'AKSHA POULTRY FARM',
+  companyAddress: '423/1,KEKUNAGOLLA,KEKUNAGOLLA.',
+  companyPhone: '+94768470361',
   currency: 'Rs.',
   defaultOvertimeRate: 350, // Per hour for monthly workers
   defaultDeductionRate: 200, // Optional standard deduction value
@@ -65,8 +65,32 @@ function getTodayDateString() {
 
 // Seed function to populate localStorage with initial values
 export function initializeDatabase() {
-  if (!localStorage.getItem(KEYS.SETTINGS)) {
+  const currentSettings = localStorage.getItem(KEYS.SETTINGS);
+  if (!currentSettings) {
     localStorage.setItem(KEYS.SETTINGS, JSON.stringify(DEFAULT_SETTINGS));
+  } else {
+    try {
+      const parsed = JSON.parse(currentSettings);
+      let updated = false;
+      // If the address, phone or name matches the old default, force update it.
+      if (parsed.companyAddress === 'Negombo Road, Kurunegala, Sri Lanka' || parsed.companyAddress === 'Negombo Rd, Kurunegala, Sri Lanka' || !parsed.companyAddress) {
+        parsed.companyAddress = DEFAULT_SETTINGS.companyAddress;
+        updated = true;
+      }
+      if (parsed.companyPhone === '+94 77 123 4567' || parsed.companyPhone === '+94771234567' || !parsed.companyPhone) {
+        parsed.companyPhone = DEFAULT_SETTINGS.companyPhone;
+        updated = true;
+      }
+      if (parsed.companyName === 'AKSHA FARM' || !parsed.companyName) {
+        parsed.companyName = DEFAULT_SETTINGS.companyName;
+        updated = true;
+      }
+      if (updated) {
+        localStorage.setItem(KEYS.SETTINGS, JSON.stringify(parsed));
+      }
+    } catch (e) {
+      console.error("Failed to migrate settings:", e);
+    }
   }
   
   if (!localStorage.getItem(KEYS.EMPLOYEES)) {

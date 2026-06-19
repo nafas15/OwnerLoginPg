@@ -42,7 +42,7 @@ let state = {
   currentSalaryPreview: null,
   
   // New State variables for sub-tabs and filters
-  activeReportTab: 'report-salary',
+  activeReportTab: 'report-attendance',
   selectedReportSalaryEmpId: 'EMP001',
   activeAttendanceSubtab: 'att-mark',
   activeEmployeeView: 'emp-dashboard',
@@ -218,29 +218,16 @@ function setupEventListeners() {
   });
 
   // Reports sub-tabs
-  document.getElementById('btn-rep-tab-salary').addEventListener('click', () => switchReportTab('report-salary'));
   document.getElementById('btn-rep-tab-attendance').addEventListener('click', () => switchReportTab('report-attendance'));
   document.getElementById('btn-rep-tab-leaves').addEventListener('click', () => switchReportTab('report-leaves'));
 
   // Reports filters
-  document.getElementById('report-month').addEventListener('change', e => {
-    state.selectedReportMonth = e.target.value;
-    drawReportsDashboard();
-  });
   document.getElementById('report-attendance-month').addEventListener('change', e => {
     drawAttendanceReportTable(e.target.value);
   });
   document.getElementById('report-leave-month').addEventListener('change', e => {
     drawLeaveReportTable(e.target.value);
   });
-  document.getElementById('report-salary-emp-id').addEventListener('change', e => {
-    state.selectedReportSalaryEmpId = e.target.value;
-    drawEmployeeSalaryHistory();
-  });
-
-  // Reports actions
-  document.getElementById('btn-print-report').addEventListener('click', () => window.print());
-  document.getElementById('btn-export-csv').addEventListener('click', exportPayrollCSV);
 
   // Settings
   document.getElementById('btn-save-settings').addEventListener('click', saveSettingsHandler);
@@ -272,7 +259,11 @@ function setupEventListeners() {
   ['btn-close-payslip-modal', 'btn-close-payslip'].forEach(id =>
     document.getElementById(id).addEventListener('click', closePayslipModal)
   );
-  document.getElementById('btn-print-payslip').addEventListener('click', () => window.print());
+  document.getElementById('btn-print-payslip').addEventListener('click', () => {
+    document.body.classList.add('print-payslip-only');
+    window.print();
+    document.body.classList.remove('print-payslip-only');
+  });
 
   // Employee actions
   document.getElementById('btn-dashboard-view-all-notif').addEventListener('click', () => navigateToEmployee('emp-notifications'));
@@ -385,7 +376,7 @@ function navigateTo(viewName) {
     'owner-attendance': drawAttendanceMarking,
     'owner-leaves'    : drawLeavesAdministration,
     'owner-salary'    : drawPayrollManagement,
-    'owner-reports'   : drawReportsDashboard,
+    'owner-reports'   : () => switchReportTab(state.activeReportTab || 'report-attendance'),
     'owner-settings'  : drawSettingsEditor,
   };
   if (drawFns[viewName]) drawFns[viewName]();
@@ -683,6 +674,7 @@ function drawPayrollManagement() {
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           <button class="btn btn-sm btn-primary-action process-sal-btn">⚙️ Process</button>
           ${calc.is_processed ? `<button class="btn btn-sm btn-secondary view-payslip-btn">📄 Payslip</button>` : ''}
+          ${calc.is_processed ? `<button class="btn btn-sm btn-primary-action print-payslip-row-btn">🖨️ Print</button>` : ''}
         </div>
       </td>
     `;
@@ -690,6 +682,20 @@ function drawPayrollManagement() {
     tr.querySelector('.process-sal-btn').addEventListener('click', () => openSalaryModal(calc));
     const psBtn = tr.querySelector('.view-payslip-btn');
     if (psBtn) psBtn.addEventListener('click', () => viewPayslipHandler(calc));
+
+    const printRowBtn = tr.querySelector('.print-payslip-row-btn');
+    if (printRowBtn) {
+      printRowBtn.addEventListener('click', () => {
+        // Load data in printable section
+        viewPayslipHandler(calc);
+        // Hide overlay visually
+        document.getElementById('payslip-modal').style.display = 'none';
+        // Trigger printing wrapper
+        document.body.classList.add('print-payslip-only');
+        window.print();
+        document.body.classList.remove('print-payslip-only');
+      });
+    }
 
     tbody.appendChild(tr);
   });
@@ -1563,15 +1569,17 @@ function drawAttendanceSummaryTable(monthStr) {
 function switchReportTab(tab) {
   state.activeReportTab = tab;
   
-  document.getElementById('btn-rep-tab-salary').classList.toggle('active', tab === 'report-salary');
+  const btnSalary = document.getElementById('btn-rep-tab-salary');
+  if (btnSalary) btnSalary.classList.toggle('active', tab === 'report-salary');
   document.getElementById('btn-rep-tab-attendance').classList.toggle('active', tab === 'report-attendance');
   document.getElementById('btn-rep-tab-leaves').classList.toggle('active', tab === 'report-leaves');
   
-  document.getElementById('subview-rep-salary').style.display = tab === 'report-salary' ? 'block' : 'none';
+  const subviewSalary = document.getElementById('subview-rep-salary');
+  if (subviewSalary) subviewSalary.style.display = tab === 'report-salary' ? 'block' : 'none';
   document.getElementById('subview-rep-attendance').style.display = tab === 'report-attendance' ? 'block' : 'none';
   document.getElementById('subview-rep-leaves').style.display = tab === 'report-leaves' ? 'block' : 'none';
 
-  if (tab === 'report-salary') {
+  if (tab === 'report-salary' && subviewSalary) {
     // Populate employee history selector
     const selector = document.getElementById('report-salary-emp-id');
     selector.innerHTML = '';
@@ -1583,9 +1591,12 @@ function switchReportTab(tab) {
       selector.appendChild(opt);
     });
     
-    // Select first employee and load salary history
+    // Select employee and load salary history
     if (employees.length > 0) {
-      state.selectedReportSalaryEmpId = employees[0].employee_id;
+      const exists = employees.some(e => e.employee_id === state.selectedReportSalaryEmpId);
+      if (!exists) {
+        state.selectedReportSalaryEmpId = employees[0].employee_id;
+      }
       selector.value = state.selectedReportSalaryEmpId;
       drawEmployeeSalaryHistory();
     }
