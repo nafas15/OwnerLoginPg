@@ -5,6 +5,7 @@ import {
   saveEmployee,
   deactivateEmployee,
   activateEmployee,
+  deleteEmployee,
   getAttendanceByDate,
   getEmployeeAttendanceForMonth,
   saveDailyAttendance,
@@ -514,11 +515,12 @@ function drawEmployeesDirectory() {
       <td>${rateLabel}</td>
       <td>${badge(emp.status, emp.status === 'Active' ? 'badge-success' : 'badge-danger')}</td>
       <td>
-        <div style="display:flex;gap:6px;">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
           <button class="btn btn-sm btn-secondary edit-emp-btn">✏️ Edit</button>
           ${emp.status === 'Active'
             ? `<button class="btn btn-sm btn-danger-action deact-btn">Deactivate</button>`
             : `<button class="btn btn-sm btn-primary-action act-btn">Activate</button>`}
+          <button class="btn btn-sm btn-danger-action remove-emp-btn">🗑️ Remove</button>
         </div>
       </td>
     `;
@@ -543,6 +545,16 @@ function drawEmployeesDirectory() {
         showToast(`${emp.name} re-activated.`, 'success');
       });
     }
+
+    tr.querySelector('.remove-emp-btn').addEventListener('click', () => {
+      if (confirm(`⚠️ Permanently remove ${emp.name} (${emp.employee_id})?\n\nThis will delete their employee record and all related history (attendance, salaries, leaves, and notifications). This action cannot be undone.`)) {
+        deleteEmployee(emp.employee_id);
+        drawEmployeesDirectory();
+        drawOwnerDashboard();
+        showToast(`${emp.name} permanently removed.`, 'success');
+      }
+    });
+
     tbody.appendChild(tr);
   });
 }
@@ -835,7 +847,15 @@ function openEmployeeModal(emp = null) {
     toggleSalaryRateInputs(emp.salary_type);
   } else {
     const list = getEmployees();
-    empIdInput.value = `EMP${String(list.length + 1).padStart(3, '0')}`;
+    let maxIdNum = 0;
+    list.forEach(e => {
+      const match = e.employee_id.match(/\d+/);
+      if (match) {
+        const num = parseInt(match[0]);
+        if (num > maxIdNum) maxIdNum = num;
+      }
+    });
+    empIdInput.value = `EMP${String(maxIdNum + 1).padStart(3, '0')}`;
     empIdInput.disabled = false;
     document.getElementById('emp-name').value           = '';
     document.getElementById('emp-phone').value          = '';

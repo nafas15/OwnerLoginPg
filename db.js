@@ -265,6 +265,36 @@ export function activateEmployee(employeeId) {
   return false;
 }
 
+export function deleteEmployee(employeeId) {
+  // Delete from employees
+  const employees = getEmployees();
+  const filteredEmployees = employees.filter(emp => emp.employee_id !== employeeId);
+  localStorage.setItem(KEYS.EMPLOYEES, JSON.stringify(filteredEmployees));
+
+  // Delete from attendance
+  const attendance = JSON.parse(localStorage.getItem(KEYS.ATTENDANCE)) || [];
+  const filteredAttendance = attendance.filter(rec => rec.employee_id !== employeeId);
+  localStorage.setItem(KEYS.ATTENDANCE, JSON.stringify(filteredAttendance));
+
+  // Delete from salaries
+  const salaries = JSON.parse(localStorage.getItem(KEYS.SALARIES)) || [];
+  const filteredSalaries = salaries.filter(rec => rec.employee_id !== employeeId);
+  localStorage.setItem(KEYS.SALARIES, JSON.stringify(filteredSalaries));
+
+  // Delete from leaves
+  const leaves = JSON.parse(localStorage.getItem(KEYS.LEAVES)) || [];
+  const filteredLeaves = leaves.filter(rec => rec.employee_id !== employeeId);
+  localStorage.setItem(KEYS.LEAVES, JSON.stringify(filteredLeaves));
+
+  // Delete from notifications
+  const notifications = JSON.parse(localStorage.getItem(KEYS.NOTIFICATIONS)) || [];
+  const filteredNotifications = notifications.filter(rec => rec.employee_id !== employeeId);
+  localStorage.setItem(KEYS.NOTIFICATIONS, JSON.stringify(filteredNotifications));
+
+  return true;
+}
+
+
 // --- Attendance API ---
 export function getAttendance() {
   return JSON.parse(localStorage.getItem(KEYS.ATTENDANCE)) || [];
